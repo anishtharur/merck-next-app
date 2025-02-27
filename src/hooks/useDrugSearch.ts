@@ -33,11 +33,18 @@ export function useDrugSearch(initialQuery: string = "") {
     }
 
     const lowerCaseQuery = query.toLowerCase();
-    return drugCandidates.filter(
-      (drug) =>
-        drug.name.toLowerCase().includes(lowerCaseQuery) ||
-        drug.description.toLowerCase().includes(lowerCaseQuery)
-    );
+    return drugCandidates.filter((drug) => {
+      const phaseMatch = drug.developmentPhase
+        .toString()
+        .includes(lowerCaseQuery);
+      const statusMatch = drug.status.toLowerCase().includes(lowerCaseQuery);
+      const nameMatch = drug.name.toLowerCase().includes(lowerCaseQuery);
+      const descriptionMatch = drug.description
+        .toLowerCase()
+        .includes(lowerCaseQuery);
+
+      return nameMatch || descriptionMatch || statusMatch || phaseMatch;
+    });
   }, [query, drugCandidates]);
 
   return {

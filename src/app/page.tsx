@@ -25,7 +25,7 @@ const LazyDrugList = dynamic(() => import("@/components/DrugList"), {
 
 const Index = () => {
   const { query, setQuery, isSearching, searchResults } = useDrugSearch();
-  const isLoading = searchResults.length === 0 && !isSearching;
+  const isLoading = isSearching && searchResults.length === 0;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
