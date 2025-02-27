@@ -1,11 +1,19 @@
-
-import { useState, useEffect, useMemo } from 'react';
-import { drugCandidates } from '@/data/drugCandidates';
-import { DrugCandidate } from '@/lib/types';
+import { useState, useEffect, useMemo } from "react";
+import { fetchDrugCandidates } from "@/data/mockApi";
+import { DrugCandidate } from "@/lib/types";
 
 export function useDrugSearch(initialQuery: string = "") {
   const [query, setQuery] = useState<string>(initialQuery);
   const [isSearching, setIsSearching] = useState(false);
+  const [drugCandidates, setDrugCandidates] = useState<DrugCandidate[]>([]);
+
+  useEffect(() => {
+    const loadDrugCandidates = async () => {
+      const candidates = (await fetchDrugCandidates()) as DrugCandidate[];
+      setDrugCandidates(candidates);
+    };
+    loadDrugCandidates();
+  }, []);
 
   useEffect(() => {
     if (query.length > 0) {
@@ -23,13 +31,14 @@ export function useDrugSearch(initialQuery: string = "") {
     if (!query) {
       return drugCandidates;
     }
-    
+
     const lowerCaseQuery = query.toLowerCase();
-    return drugCandidates.filter((drug) => 
-      drug.name.toLowerCase().includes(lowerCaseQuery) || 
-      drug.description.toLowerCase().includes(lowerCaseQuery)
+    return drugCandidates.filter(
+      (drug) =>
+        drug.name.toLowerCase().includes(lowerCaseQuery) ||
+        drug.description.toLowerCase().includes(lowerCaseQuery)
     );
-  }, [query]);
+  }, [query, drugCandidates]);
 
   return {
     query,

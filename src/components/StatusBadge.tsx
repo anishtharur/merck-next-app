@@ -16,7 +16,10 @@ const StatusBadge = ({ status, className }: StatusBadgeProps) => {
   };
 
   return (
-    <span className={cn(baseClasses, statusConfig[status], className)}>
+    <span
+      role="status"
+      className={cn(baseClasses, statusConfig[status], className)}
+    >
       {status}
     </span>
   );

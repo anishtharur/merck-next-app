@@ -14,6 +14,7 @@ const DrugCard = ({ drug, index }: DrugCardProps) => {
       href={`/drug/${drug.id}`}
       className="opacity-0 animate-fadeIn block"
       style={{ animationDelay: `${index * 75}ms` }}
+      aria-label={`View details for ${drug.name}`}
     >
       <div className="group relative bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 h-full card-hover">
         <div className="flex justify-between items-start mb-3">

@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -31,6 +32,7 @@ const SearchBar = ({ value, onChange, isSearching }: SearchBarProps) => {
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         placeholder="Search drug candidates..."
+        aria-label="Search drug candidates"
         className="w-full py-3 pl-2 pr-4 bg-transparent outline-none text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
       />
       {value && (
