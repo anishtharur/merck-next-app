@@ -26,7 +26,7 @@ const Index = () => {
           <p className="text-sm font-medium text-pharma-500 dark:text-pharma-400 tracking-wider uppercase mb-3">
             Drug Candidate Management
           </p>
-          <h1 className="text-4xl font-serif md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
             Therapeutic Candidate
             <br />
             Database

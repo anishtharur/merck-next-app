@@ -19,7 +19,7 @@ const DrugCard = ({ drug, index }: DrugCardProps) => {
         <div className="flex justify-between items-start mb-3">
           <div>
             <StatusBadge status={drug.status} />
-            <h3 className="mt-2 text-xl font-serif font-semibold text-gray-900 dark:text-gray-100 group-hover:text-pharma-500 transition-colors duration-200">
+            <h3 className="mt-2 text-xl font-semibold text-gray-900 dark:text-gray-100 group-hover:text-pharma-500 transition-colors duration-200">
               {drug.name}
             </h3>
           </div>
