@@ -4,10 +4,12 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0-38B2AC)
 ![Jest](https://img.shields.io/badge/Jest-29-C21325)
+[![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://merck-next-app.vercel.app/)
 
 ## Table of Contents
 
 - [Overview](#overview)
+- [Demo](#demo)
 - [Technical Stack](#technical-stack)
 - [Installation](#installation)
 - [Core Features](#core-features)
@@ -24,6 +26,17 @@
 ## Overview
 
 The Merck Drug Candidate Management Application is a modern web application built with Next.js that provides a comprehensive interface for exploring and managing drug candidates in various stages of development. The application features a responsive design with dark mode support and smooth animations.
+
+## Demo
+
+Visit the live application: [Merck Drug Candidate Management](https://merck-next-app.vercel.app/)
+
+The application is deployed on Vercel and showcases:
+
+- Real-time search and filtering of drug candidates
+- Detailed information about each drug
+- Responsive design with dark mode support
+- Smooth animations and transitions
 
 ## Installation
 
