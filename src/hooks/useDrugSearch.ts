@@ -28,11 +28,12 @@ export function useDrugSearch(initialQuery: string = "") {
   }, [query]);
 
   const searchResults = useMemo(() => {
-    if (!query) {
+    if (!query || !drugCandidates.length) {
       return drugCandidates;
     }
 
     const lowerCaseQuery = query.toLowerCase();
+
     return drugCandidates.filter((drug) => {
       const phaseMatch = drug.developmentPhase
         .toString()
