@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import SearchBar from "@/components/SearchBar";
 import { useDrugSearch } from "@/hooks/useDrugSearch";
 import { FilterIcon } from "lucide-react";
