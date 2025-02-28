@@ -7,6 +7,8 @@ export function useDrugSearch(initialQuery: string = "") {
   const [isSearching, setIsSearching] = useState(false);
   const [drugCandidates, setDrugCandidates] = useState<DrugCandidate[]>([]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState("All Statuses");
+  const [phaseFilter, setPhaseFilter] = useState("All Phases");
 
   // Load initial drug candidates
   useEffect(() => {
@@ -47,28 +49,30 @@ export function useDrugSearch(initialQuery: string = "") {
 
   // Filter results based on query
   const searchResults = useMemo(() => {
-    // If no query, return all candidates
-    if (!query.trim()) {
+    if (
+      !query.trim() &&
+      statusFilter === "All Statuses" &&
+      phaseFilter === "All Phases"
+    ) {
       return drugCandidates;
     }
 
     const lowerCaseQuery = query.toLowerCase().trim();
 
     return drugCandidates.filter((drug) => {
-      // Convert phase to string to handle both number and string values
-      const phaseMatch = String(drug.developmentPhase)
-        .toLowerCase()
-        .includes(lowerCaseQuery);
-
-      const statusMatch = drug.status.toLowerCase().includes(lowerCaseQuery);
+      const phaseMatch =
+        phaseFilter === "All Phases" ||
+        drug.developmentPhase.toString() === phaseFilter;
+      const statusMatch =
+        statusFilter === "All Statuses" || drug.status === statusFilter;
       const nameMatch = drug.name.toLowerCase().includes(lowerCaseQuery);
       const descriptionMatch = drug.description
         .toLowerCase()
         .includes(lowerCaseQuery);
 
-      return nameMatch || descriptionMatch || statusMatch || phaseMatch;
+      return (nameMatch || descriptionMatch) && phaseMatch && statusMatch;
     });
-  }, [query, drugCandidates]);
+  }, [query, drugCandidates, statusFilter, phaseFilter]);
 
   return {
     query,
@@ -76,6 +80,10 @@ export function useDrugSearch(initialQuery: string = "") {
     isSearching,
     searchResults,
     isInitialLoading,
+    statusFilter,
+    setStatusFilter,
+    phaseFilter,
+    setPhaseFilter,
     // For debugging
     totalCandidates: drugCandidates.length,
   };

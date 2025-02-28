@@ -1,8 +1,7 @@
-
 export interface DrugCandidate {
   id: string;
   name: string;
-  status: 'In Development' | 'Approved' | 'Discontinued';
+  status: "In Development" | "Approved" | "Discontinued";
   description: string;
   mechanismOfAction: string;
   sideEffects: string[];
@@ -12,10 +11,4 @@ export interface DrugCandidate {
 
 export type SearchParams = {
   query: string;
-};
-
-// Add Next.js inspired types even though we're using Vite
-export type Route = {
-  params: { [key: string]: string };
-  query: { [key: string]: string | string[] };
 };

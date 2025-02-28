@@ -2,6 +2,7 @@
 
 import SearchBar from "@/components/SearchBar";
 import { useDrugSearch } from "@/hooks/useDrugSearch";
+import { FilterIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const LazyDrugList = dynamic(() => import("@/components/DrugList"), {
@@ -25,8 +26,17 @@ const LazyDrugList = dynamic(() => import("@/components/DrugList"), {
 });
 
 const Index = () => {
-  const { query, setQuery, isSearching, searchResults, isInitialLoading } =
-    useDrugSearch();
+  const {
+    query,
+    setQuery,
+    isSearching,
+    searchResults,
+    isInitialLoading,
+    statusFilter,
+    setStatusFilter,
+    phaseFilter,
+    setPhaseFilter,
+  } = useDrugSearch();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -34,7 +44,7 @@ const Index = () => {
         className={`w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 transition-opacity duration-500 opacity-100`}
       >
         <div
-          className="text-center max-w-3xl mx-auto mb-16 opacity-0 animate-fadeIn"
+          className="text-center max-w-3xl mx-auto mb-10 opacity-0 animate-fadeIn"
           style={{ animationDelay: "100ms" }}
         >
           <p className="text-sm font-medium text-pharma-500 dark:text-pharma-400 tracking-wider uppercase mb-3">
@@ -49,17 +59,42 @@ const Index = () => {
             Explore our pipeline of innovative drug candidates at various stages
             of development.
           </p>
-          <div className="max-w-lg mx-auto">
-            <SearchBar
-              value={query}
-              onChange={setQuery}
-              isSearching={isSearching}
-            />
+          <div>
+            <div className="max-w-lg mx-auto">
+              <SearchBar
+                value={query}
+                onChange={setQuery}
+                isSearching={isSearching}
+              />
+            </div>
+            <div className="flex justify-center items-center mt-4 space-x-2  md:space-x-4 font-semibold text-sm text-black dark:text-white">
+              <FilterIcon />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pharma-500 font"
+              >
+                <option>All Statuses</option>
+                <option>In Development</option>
+                <option>Approved</option>
+                <option>Discontinued</option>
+              </select>
+              <select
+                value={phaseFilter}
+                onChange={(e) => setPhaseFilter(e.target.value)}
+                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pharma-500"
+              >
+                <option value="All Phases">All Phases</option>
+                <option value="1">Phase 1</option>
+                <option value="2">Phase 2</option>
+                <option value="3">Phase 3</option>
+              </select>
+            </div>
           </div>
         </div>
 
         <div
-          className="mt-12 opacity-0 animate-fadeIn"
+          className="opacity-0 animate-fadeIn"
           style={{ animationDelay: "300ms" }}
         >
           {isInitialLoading ? (
