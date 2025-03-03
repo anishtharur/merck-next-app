@@ -53,9 +53,6 @@ npm run dev
 # Build for production
 npm run build
 
-# Run production server
-npm start
-
 # Run tests
 npm test
 ```
