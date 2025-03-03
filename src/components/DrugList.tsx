@@ -166,7 +166,7 @@ const DrugList = ({ drugs, isSearching }: DrugListProps) => {
   return (
     <div
       ref={containerRef}
-      className="h-[400px] md:h-[800px] overflow-y-auto custom-scrollbar"
+      className="h-[400px] overflow-y-auto custom-scrollbar"
       onScroll={handleScroll}
     >
       <div
