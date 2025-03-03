@@ -2,18 +2,20 @@ import { DrugCandidate } from "@/lib/types";
 import StatusBadge from "@/components/StatusBadge";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { memo } from "react";
 
 interface DrugCardProps {
   drug: DrugCandidate;
   index: number;
+  style?: React.CSSProperties;
 }
 
-const DrugCard = ({ drug, index }: DrugCardProps) => {
+const DrugCard = memo(({ drug, style }: DrugCardProps) => {
   return (
     <Link
       href={`/drug/${drug.id}`}
-      className="opacity-0 animate-fadeIn block"
-      style={{ animationDelay: `${index * 75}ms` }}
+      className="block transition-opacity duration-200 ease-in-out opacity-100"
+      style={style}
       aria-label={`View details for ${drug.name}`}
     >
       <div className="group relative bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 h-full card-hover">
@@ -66,6 +68,8 @@ const DrugCard = ({ drug, index }: DrugCardProps) => {
       </div>
     </Link>
   );
-};
+});
+
+DrugCard.displayName = "DrugCard";
 
 export default DrugCard;

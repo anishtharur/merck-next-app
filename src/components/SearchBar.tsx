@@ -13,6 +13,15 @@ interface SearchBarProps {
 const SearchBar = ({ value, onChange, isSearching }: SearchBarProps) => {
   const [isFocused, setIsFocused] = useState(false);
 
+  const handleFocus = () => {
+    setIsFocused(true);
+    // Smooth scroll to top
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <div
       className={cn(
@@ -30,7 +39,7 @@ const SearchBar = ({ value, onChange, isSearching }: SearchBarProps) => {
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setIsFocused(true)}
+        onFocus={handleFocus}
         onBlur={() => setIsFocused(false)}
         placeholder="Search drug candidates..."
         aria-label="Search drug candidates"
