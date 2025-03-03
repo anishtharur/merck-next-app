@@ -1,6 +1,6 @@
 import { DrugCandidate } from "@/lib/types";
 import DrugCard from "./DrugCard";
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo, memo } from "react";
 import { debounce } from "lodash";
 
 interface DrugListProps {
@@ -10,22 +10,53 @@ interface DrugListProps {
 // Constants for virtualization
 const CARD_HEIGHT = 250;
 const WINDOW_HEIGHT = 900;
-const OVERSCAN = 5; // Increased for smoother scrolling
+const OVERSCAN = 5;
 
-const DrugList = ({ drugs }: DrugListProps) => {
+// Memoized empty state component
+const EmptyState = memo(() => (
+  <div className="flex flex-col items-center justify-center py-12 text-center bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800">
+    <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-4 mb-4">
+      <svg
+        className="w-6 h-6 text-gray-500 dark:text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
+    </div>
+    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
+      No results found
+    </h3>
+    <p className="text-gray-500 dark:text-gray-400">
+      Try adjusting your search criteria
+    </p>
+  </div>
+));
+
+EmptyState.displayName = "EmptyState";
+
+const DrugList = memo(({ drugs }: DrugListProps) => {
   const [scrollTop, setScrollTop] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [itemsPerRow, setItemsPerRow] = useState(3);
   const ticking = useRef(false);
 
+  // Memoized resize handler
+  const updateItemsPerRow = useCallback(() => {
+    if (window.innerWidth >= 1024) setItemsPerRow(3);
+    else if (window.innerWidth >= 768) setItemsPerRow(2);
+    else setItemsPerRow(1);
+  }, []);
+
   // Handle window resize for responsive grid
   useEffect(() => {
-    const updateItemsPerRow = () => {
-      if (window.innerWidth >= 1024) setItemsPerRow(3);
-      else if (window.innerWidth >= 768) setItemsPerRow(2);
-      else setItemsPerRow(1);
-    };
-
     const debouncedResize = debounce(updateItemsPerRow, 100);
     updateItemsPerRow();
     window.addEventListener("resize", debouncedResize);
@@ -33,11 +64,11 @@ const DrugList = ({ drugs }: DrugListProps) => {
       window.removeEventListener("resize", debouncedResize);
       debouncedResize.cancel();
     };
-  }, []);
+  }, [updateItemsPerRow]);
 
   // Memoized calculations for better performance
   const getVisibleRange = useCallback(() => {
-    const rowHeight = CARD_HEIGHT + 24; // card height + gap
+    const rowHeight = CARD_HEIGHT + 24;
     const visibleRows = Math.ceil(WINDOW_HEIGHT / rowHeight);
     const startRow = Math.max(0, Math.floor(scrollTop / rowHeight) - OVERSCAN);
     const endRow = Math.min(
@@ -70,38 +101,13 @@ const DrugList = ({ drugs }: DrugListProps) => {
   );
 
   if (drugs.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-center bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800">
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-4 mb-4">
-          <svg
-            className="w-6 h-6 text-gray-500 dark:text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-        </div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
-          No results found
-        </h3>
-        <p className="text-gray-500 dark:text-gray-400">
-          Try adjusting your search criteria
-        </p>
-      </div>
-    );
+    return <EmptyState />;
   }
 
   return (
     <div
       ref={containerRef}
-      className="h-[400px] md:h-[450px] overflow-y-auto custom-scrollbar mt-10"
+      className="h-[400px] md:h-[450px] overflow-y-auto custom-scrollbar mt-10 md:pt-2 overscroll-none"
       onScroll={handleScroll}
     >
       <div
@@ -110,6 +116,7 @@ const DrugList = ({ drugs }: DrugListProps) => {
           height: `${
             Math.ceil(drugs.length / itemsPerRow) * (CARD_HEIGHT + 24)
           }px`,
+          willChange: "transform",
         }}
       >
         <div
@@ -123,18 +130,15 @@ const DrugList = ({ drugs }: DrugListProps) => {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {visibleDrugs.map((drug) => (
-              <div
-                key={drug.id}
-                className="relative transition-transform hover:-translate-y-1 hover:shadow-lg duration-200"
-              >
-                <DrugCard drug={drug} index={drugs.indexOf(drug)} />
-              </div>
+              <DrugCard key={drug.id} drug={drug} index={drugs.indexOf(drug)} />
             ))}
           </div>
         </div>
       </div>
     </div>
   );
-};
+});
+
+DrugList.displayName = "DrugList";
 
 export default DrugList;

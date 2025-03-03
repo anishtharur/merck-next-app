@@ -1,31 +1,51 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import SearchBar from "@/components/SearchBar";
 import { useDrugSearch } from "@/hooks/useDrugSearch";
 import { FilterIcon } from "lucide-react";
 import dynamic from "next/dynamic";
+import { memo } from "react";
+import Header from "@/components/Header";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 
+// Lazy load DrugList with loading state
 const LazyDrugList = dynamic(() => import("@/components/DrugList"), {
-  loading: () => (
-    <div className="animate-stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[...Array(3)].map((_, i) => (
-        <div
-          key={i}
-          className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-6 shadow-sm animate-pulse"
-        >
-          <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-          <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-3"></div>
-          <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-          <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-          <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-          <div className="h-3 w-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
-        </div>
-      ))}
-    </div>
-  ),
+  loading: () => <LoadingSkeleton />,
+  ssr: false,
 });
 
+// Memoized filter select component
+const FilterSelect = memo(
+  ({
+    value,
+    onChange,
+    options,
+    label,
+  }: {
+    value: string;
+    onChange: (value: string) => void;
+    options: { value: string; label: string }[];
+    label: string;
+  }) => (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pharma-500"
+      aria-label={label}
+    >
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  )
+);
+
+FilterSelect.displayName = "FilterSelect";
+
+// Main component
 const Index = () => {
   const {
     query,
@@ -39,100 +59,97 @@ const Index = () => {
     setPhaseFilter,
   } = useDrugSearch();
 
+  // Memoize filter options
+  const statusOptions = useMemo(
+    () => [
+      { value: "All Statuses", label: "All Statuses" },
+      { value: "In Development", label: "In Development" },
+      { value: "Approved", label: "Approved" },
+      { value: "Discontinued", label: "Discontinued" },
+    ],
+    []
+  );
+
+  const phaseOptions = useMemo(
+    () => [
+      { value: "All Phases", label: "All Phases" },
+      { value: "1", label: "Phase 1" },
+      { value: "2", label: "Phase 2" },
+      { value: "3", label: "Phase 3" },
+    ],
+    []
+  );
+
+  // Memoize content based on loading and search states
+  const content = useMemo(() => {
+    if (isInitialLoading) {
+      return (
+        <p className="italic text-center text-gray-600 dark:text-gray-300">
+          Loading drug candidates...
+        </p>
+      );
+    }
+
+    if (isSearching) {
+      return <LoadingSkeleton />;
+    }
+
+    if (searchResults.length === 0 && query) {
+      return (
+        <p className="text-center text-gray-600 dark:text-gray-300">
+          No results found for &quot;{query}&quot;.
+        </p>
+      );
+    }
+
+    if (searchResults.length === 0) {
+      return (
+        <p className="text-center text-gray-600 dark:text-gray-300">
+          No drug candidates available.
+        </p>
+      );
+    }
+    return <LazyDrugList drugs={searchResults} />;
+  }, [isInitialLoading, isSearching, searchResults, query]);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-      <div
-        className={`w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 transition-opacity duration-500 opacity-100`}
-      >
-        <div
-          className="text-center max-w-3xl mx-auto mb-10 opacity-0 animate-fadeIn"
-          style={{ animationDelay: "100ms" }}
-        >
-          <p className="text-sm font-medium text-pharma-500 dark:text-pharma-400 tracking-wider uppercase mb-3">
-            Drug Candidate Management
-          </p>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-            Merck Group Candidate
-            <br />
-            Database
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-            Explore our pipeline of innovative drug candidates at various stages
-            of development.
-          </p>
-          <div>
-            <div className="max-w-lg mx-auto">
-              <SearchBar
-                value={query}
-                onChange={setQuery}
-                isSearching={isSearching}
-              />
-            </div>
-            <div className="flex justify-center items-center mt-4 space-x-2  md:space-x-4 font-semibold text-sm text-black dark:text-white">
-              <FilterIcon />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pharma-500 font"
-              >
-                <option>All Statuses</option>
-                <option>In Development</option>
-                <option>Approved</option>
-                <option>Discontinued</option>
-              </select>
-              <select
-                value={phaseFilter}
-                onChange={(e) => setPhaseFilter(e.target.value)}
-                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pharma-500"
-              >
-                <option value="All Phases">All Phases</option>
-                <option value="1">Phase 1</option>
-                <option value="2">Phase 2</option>
-                <option value="3">Phase 3</option>
-              </select>
-            </div>
-          </div>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 transition-opacity duration-500 opacity-100">
+        <Header />
+
+        <div className="max-w-lg mx-auto">
+          <SearchBar
+            value={query}
+            onChange={setQuery}
+            isSearching={isSearching}
+          />
+        </div>
+
+        <div className="flex justify-center items-center mt-4 space-x-2 md:space-x-4 font-semibold text-sm text-black dark:text-white">
+          <FilterIcon />
+          <FilterSelect
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={statusOptions}
+            label="Filter by status"
+          />
+          <FilterSelect
+            value={phaseFilter}
+            onChange={setPhaseFilter}
+            options={phaseOptions}
+            label="Filter by phase"
+          />
         </div>
 
         <div
-          className="opacity-0 animate-fadeIn"
+          className="opacity-0 animate-fadeIn mt-10"
           style={{ animationDelay: "300ms" }}
         >
-          {isInitialLoading ? (
-            <p className="italic text-center text-gray-600 dark:text-gray-300">
-              Loading drug candidates...
-            </p>
-          ) : isSearching ? (
-            <div className="animate-stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(3)].map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-6 shadow-sm animate-pulse"
-                >
-                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-                  <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-3"></div>
-                  <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                  <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                  <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-                  <div className="h-3 w-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                </div>
-              ))}
-            </div>
-          ) : searchResults.length === 0 && query ? (
-            <p className="text-center text-gray-600 dark:text-gray-300">
-              No results found for &quot;{query}&quot;.
-            </p>
-          ) : searchResults.length === 0 ? (
-            <p className="text-center text-gray-600 dark:text-gray-300">
-              No drug candidates available.
-            </p>
-          ) : (
-            <LazyDrugList drugs={searchResults} />
-          )}
+          {content}
         </div>
       </div>
     </div>
   );
 };
 
-export default Index;
+export default memo(Index);
