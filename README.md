@@ -94,6 +94,12 @@ Individual drug pages featuring:
 
 ### 3. Components
 
+#### Header (`src/components/Header.tsx`)
+
+- Main page header with title and description
+- Memoized for performance
+- Smooth fade-in animation
+
 #### SearchBar (`src/components/SearchBar.tsx`)
 
 - Real-time search functionality
@@ -105,6 +111,7 @@ Individual drug pages featuring:
 - Displays drug summary information
 - Status badge integration
 - Click-through to detailed view
+- Memoized for performance optimization
 
 #### StatusBadge (`src/components/StatusBadge.tsx`)
 
@@ -117,8 +124,22 @@ Individual drug pages featuring:
 #### DrugList (`src/components/DrugList.tsx`)
 
 - Grid layout for drug cards
-- Lazy loading support
 - Responsive design
+- Virtualized scrolling for large lists
+
+#### LoadingSkeleton (`src/components/LoadingSkeleton.tsx`)
+
+- Reusable loading state component
+- Smooth pulse animations
+- Responsive grid layout
+- Memoized for consistent performance
+
+#### FilterSelect (`src/components/FilterSelect.tsx`)
+
+- Reusable filter dropdown component
+- Accessible form controls with ARIA labels
+- Dark mode support
+- Memoized to prevent unnecessary rerenders
 
 #### ThemeToggle (`src/components/ThemeToggle.tsx`)
 
@@ -231,11 +252,69 @@ interface DrugCandidate {
 
 ## Performance Optimizations
 
-1. Dynamic imports for large components
-2. Lazy loading of drug list
-3. Optimized animations
-4. Efficient state management
-5. Responsive image loading
+1. **Component Optimizations**
+
+   - Extensive use of `React.memo` for pure components
+   - Proper component display names for debugging
+   - Strategic component splitting for better code organization
+   - Debounced event handlers for resize and scroll events
+
+2. **Loading Optimizations**
+
+   - Dynamic imports for large components
+   - SSR disabled for interactive components
+   - Optimized loading skeleton components
+   - Smooth loading state transitions
+   - Progressive loading with animation delays
+
+3. **List Virtualization**
+
+   - Windowed rendering for `DrugList` component
+   - Only renders items currently in viewport
+   - Configurable overscan for smooth scrolling
+   - Dynamic row height calculations based on screen size
+   - Memory efficient handling of large datasets
+   - Responsive grid adaptation with virtualization
+   - Debounced scroll handling with requestAnimationFrame
+
+4. **State Management**
+
+   - Efficient use of `useMemo` for computed values
+   - Memoized filter options and callbacks
+   - Optimized conditional rendering
+   - Controlled component updates with proper dependency arrays
+
+5. **UI Performance**
+
+   - Optimized animations with will-change
+   - Responsive image loading
+   - Efficient grid layouts
+   - Smooth dark mode transitions
+   - Custom scrollbar optimization
+   - Staggered animations for list items
+   - Hardware-accelerated transitions
+
+6. **CSS Optimizations**
+
+   - Tailwind JIT compilation for minimal CSS
+   - Custom utility classes for performance
+   - Efficient use of CSS transforms
+   - Optimized dark mode transitions
+   - GPU-accelerated animations
+   - Reduced paint operations with opacity/transform
+   - Custom scrollbar styling for better performance
+
+7. **Code Splitting**
+   - Dynamic import of the `DrugList` component for better initial page load
+   - Component architecture split into logical, reusable pieces:
+     - `Header`: Page header component
+     - `LoadingSkeleton`: Loading state component
+     - `DrugCard`: Individual drug card component
+     - `StatusBadge`: Status indicator component
+     - `FilterSelect`: Reusable filter component
+     - `ThemeToggle`: Theme switching component
+   - Each component is focused on a single responsibility
+   - Components are organized by feature and functionality
 
 ## Best Practices
 
