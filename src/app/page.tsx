@@ -127,7 +127,7 @@ const Index = () => {
               No drug candidates available.
             </p>
           ) : (
-            <LazyDrugList drugs={searchResults} isSearching={false} />
+            <LazyDrugList drugs={searchResults} />
           )}
         </div>
       </div>
